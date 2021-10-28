@@ -10,3 +10,6 @@ tasks:
   run:
     cmds:
       - go run app/main.go
+  docker-build:
+    cmds:
+      - docker build -t docker.pkg.github.com/sonac/ogg/ogg .

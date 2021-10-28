@@ -13,15 +13,14 @@ jobs:
       - uses: actions/setup-node@v1
       - name: build docker image
         run: |
-          yarn --cwd client install
-          make docker-build
+          task docker-build
       - name: push to github packages
         uses: docker/build-push-action@v1
         with:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: sonac/wtw/wtw
+          repository: sonac/ogg/ogg
           tag_with_ref: true
       - name: Deploy to DigitalOcean
         uses: appleboy/ssh-action@master
