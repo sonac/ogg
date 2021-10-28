@@ -1,2 +1,5 @@
 .idea
 .env
+.dockerenv
+mongo-init.js
+oggData

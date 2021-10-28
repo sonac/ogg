@@ -17,9 +17,9 @@ type HTTPClient interface {
 }
 
 type Client struct {
-	YandexApiKey string
-	Database     *store.Mongo
-	Words        []*models.Word
+	yandexApiKey string
+	database     *store.Mongo
+	words        []*models.Word
 }
 
 type Translation struct {
@@ -53,16 +53,25 @@ func NewTranslator(yandexApiKey string) *Client {
 	if err != nil {
 		log.Fatalf("failed to initialize translator, %s", err)
 	}
-	return &Client{YandexApiKey: yandexApiKey, Database: db, Words: words}
+	return &Client{yandexApiKey: yandexApiKey, database: db, words: words}
+}
+
+func (c *Client) RefreshWords() error {
+	words, err := c.database.GetWords()
+	if err != nil {
+		return err
+	}
+	c.words = words
+	return nil
 }
 
 func (c *Client) GetRandomWord() *models.Word {
 	rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
-	return c.Words[rand.Intn(len(c.Words))]
+	return c.words[rand.Intn(len(c.words))]
 }
 
 func (c *Client) TranslateWord(word string) (*models.Word, error) {
-	url := fmt.Sprintf("https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key=%s&lang=en-de&text=%s", c.YandexApiKey, word)
+	url := fmt.Sprintf("https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key=%s&lang=en-de&text=%s", c.yandexApiKey, word)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

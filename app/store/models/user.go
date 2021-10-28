@@ -1,6 +1,6 @@
 package models
 
 type User struct {
-	TelegramChat int64 `bson:"telegram_chat"`
+	TelegramChatId int64 `bson:"telegram_chat_id"`
 	BestStreak int64 `bson:"best_streak"`
 }

@@ -37,6 +37,6 @@ func (m *Mongo) Connect() {
 	}
 
 	m.Client = client
-	m.UserCollection = client.Database("german_words").Collection("users")
-	m.WordCollection = client.Database("german_words").Collection("words")
+	m.UserCollection = client.Database("ogg").Collection("users")
+	m.WordCollection = client.Database("ogg").Collection("words")
 }
