@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install Task
+        uses: arduino/setup-task@v1
       - name: build docker image
         run: |
           task docker-build
