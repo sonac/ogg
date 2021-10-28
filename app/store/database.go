@@ -37,6 +37,6 @@ func (m *Mongo) Connect() {
 	}
 
 	m.Client = client
-	m.UserCollection = client.Database("wtw").Collection("users") //TODO: remove hardcoded db
+	m.UserCollection = client.Database("wtw").Collection("ogg_users") //TODO: remove hardcoded db
 	m.WordCollection = client.Database("wtw").Collection("words")
 }
