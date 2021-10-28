@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
+	"next-german-words/app/store/models"
 	"testing"
 )
 
@@ -15,6 +16,16 @@ type MockHTTP struct {
 
 func (m *MockHTTP) Do(req *http.Request) (*http.Response, error) {
 	return m.MockDo(req)
+}
+
+type MockGetWordsType func() ([]*models.Word, error)
+
+type MockDatabase struct {
+	MockGetWords MockGetWordsType
+}
+
+func (m *MockDatabase) GetWords() ([]*models.Word, error) {
+	return nil, nil
 }
 
 func TestClient_TranslateWord(t *testing.T) {

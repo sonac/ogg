@@ -16,9 +16,13 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
+type Database interface {
+	GetWords() ([]*models.Word, error)
+}
+
 type Client struct {
 	yandexApiKey string
-	database     *store.Mongo
+	database     Database
 	words        []*models.Word
 }
 
@@ -41,14 +45,15 @@ type TranslateResp struct {
 
 var (
 	httpClient HTTPClient
+	db Database
 )
 
 func init() {
 	httpClient = &http.Client{}
+	db = store.NewDatabase()
 }
 
 func NewTranslator(yandexApiKey string) *Client {
-	db := store.NewDatabase()
 	words, err := db.GetWords()
 	if err != nil {
 		log.Fatalf("failed to initialize translator, %s", err)
