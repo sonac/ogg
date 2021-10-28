@@ -1,0 +1,12 @@
+version: 3
+
+tasks:
+  test:
+    cmds:
+      - go test -v ./...
+  mongo:
+    cmds:
+      - docker-compose up -d mongodb
+  run:
+    cmds:
+      - go run app/main.go

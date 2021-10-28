@@ -10,8 +10,6 @@ services:
       - app-network
     env_file:
       - .dockerenv
-    command: >
-      sh -c 'dockerize -wait tcp://mongodb:27017 -timeout 60s && ./wtw'
   mongodb:
     image: mongo:latest
     container_name: mongodb

@@ -1,0 +1,40 @@
+name: publish
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-publish:
+    name: Building and publishing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+      - name: build docker image
+        run: |
+          yarn --cwd client install
+          make docker-build
+      - name: push to github packages
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: sonac/wtw/wtw
+          tag_with_ref: true
+      - name: Deploy to DigitalOcean
+        uses: appleboy/ssh-action@master
+        env:
+          GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
+        with:
+          host: ${{ secrets.DROPLET_IP }}
+          key: ${{ secrets.SSH_KEY }}
+          username: ${{ secrets.SSH_USER }}
+          envs: GITHUB_USERNAME
+          script: |
+            cd apps
+            docker-compose stop ogg
+            cat gh_token | docker login docker.pkg.github.com -u $GITHUB_USERNAME --password-stdin
+            docker pull docker.pkg.github.com/sonac/ogg/ogg:latest
+            docker-compose up -d ogg

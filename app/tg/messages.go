@@ -1,6 +1,7 @@
 package tg
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 	"next-german-words/app/store/models"
@@ -22,6 +23,7 @@ func (tg *Telegram) start(chatId int64) {
 		return
 	}
 	tg.sendMessage("Welcome!", chatId)
+	tg.sendListManageButton(chatId)
 }
 
 func (tg *Telegram) addWord(msg *tgbotapi.Message) {
@@ -44,4 +46,79 @@ func (tg *Telegram) addWord(msg *tgbotapi.Message) {
 		log.Println(err)
 		return
 	}
+	tg.sendMessage(fmt.Sprintf("%s now in the database", translatedWord.German), msg.Chat.ID)
+}
+
+func (tg *Telegram) sendRandomWord(chatId int64) {
+	word := tg.Tr.GetRandomWord()
+	usr, err := tg.DB.GetUserByChatId(chatId)
+	if err != nil {
+		tg.sendMessage("internal error occurred", chatId)
+		log.Println(err)
+		return
+	}
+	usr.CurWord = *word
+	err = tg.DB.UpdateUser(usr)
+	if err != nil {
+		tg.sendMessage("internal error occurred", chatId)
+		log.Println(err)
+		return
+	}
+	keyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("der", "der"),
+			tgbotapi.NewInlineKeyboardButtonData("die", "die"),
+			tgbotapi.NewInlineKeyboardButtonData("das", "das"),
+			),
+		)
+	msg := tgbotapi.NewMessage(chatId, word.German)
+	msg.ReplyMarkup = keyboard
+	_, err = tg.Bot.Send(msg)
+	if err != nil {
+		tg.sendMessage("internal error occurred", chatId)
+		log.Println(err)
+		return
+	}
+}
+
+func (tg *Telegram) checkAnswer(cb *tgbotapi.CallbackQuery) {
+	chatId := cb.Message.Chat.ID
+	ans := cb.Data
+	usr, err := tg.DB.GetUserByChatId(chatId)
+	if err != nil {
+		tg.sendMessage("internal error occurred", chatId)
+		log.Println(err)
+		return
+	}
+	correctAns := genToArticle(usr.CurWord.Gen)
+	if correctAns == ans {
+		tg.sendMessage("Correct!", chatId)
+	} else {
+		tg.sendMessage(fmt.Sprintf("Wrong! Correct answer is %s", correctAns), chatId)
+	}
+	tg.sendRandomWord(chatId)
+}
+
+func articleToGen(article string) string {
+	switch article {
+	case "der":
+		return "m"
+	case "die":
+		return "f"
+	case "das":
+		return "n"
+	}
+	return ""
+}
+
+func genToArticle(gen string) string {
+	switch gen {
+	case "m":
+		return "der"
+	case "f":
+		return "die"
+	case "n":
+		return "das"
+	}
+	return ""
 }
