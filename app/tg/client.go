@@ -22,6 +22,8 @@ type Database interface {
 	FindWord(german string) (*models.Word, error)
 	GetWords() ([]*models.Word, error)
 	InsertUser(user *models.User) (bool, error)
+	GetUserByChatId (chatId int64) (*models.User, error)
+	UpdateUser(user *models.User) error
 }
 
 type Translator interface {
@@ -71,7 +73,9 @@ func (tg *Telegram) readUpdates(updateConfig tgbotapi.UpdateConfig) {
 		log.Fatalln(err)
 	}
 	for upd := range updates {
-		log.Println("Received a message: ", upd.Message.Text)
+		if upd.CallbackQuery != nil {
+			tg.replyToCallback(upd.CallbackQuery)
+		}
 		if upd.Message != nil {
 			tg.replyToMessage(upd.Message)
 		}
@@ -86,6 +90,8 @@ func (tg *Telegram) replyToMessage(msg *tgbotapi.Message) {
 	switch msg.Text {
 	case "start":
 		tg.start(msg.Chat.ID)
+	case "Next Word":
+		tg.sendRandomWord(msg.Chat.ID)
 	default:
 		tg.sendMessage("I don't understand", msg.Chat.ID)
 	}
@@ -93,9 +99,17 @@ func (tg *Telegram) replyToMessage(msg *tgbotapi.Message) {
 
 func (tg *Telegram) replyToCommand(msg *tgbotapi.Message) {
 	switch msg.Command() {
+	case "start":
+		tg.start(msg.Chat.ID)
 	case "add":
 		tg.addWord(msg)
+	case "restart":
+		tg.sendListManageButton(msg.Chat.ID)
 	}
+}
+
+func (tg *Telegram) replyToCallback(cb *tgbotapi.CallbackQuery) {
+	tg.checkAnswer(cb)
 }
 
 func (tg *Telegram) sendMessage(msg string, chatId int64) {
@@ -104,5 +118,23 @@ func (tg *Telegram) sendMessage(msg string, chatId int64) {
 	if err != nil {
 		log.Printf("[ERROR] Occured during sending message to tg chat %d", chatId)
 		log.Fatalln(err)
+	}
+}
+
+func (tg *Telegram) sendListManageButton(chatId int64) {
+	keyboard := tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("Next Word"),
+			tgbotapi.NewKeyboardButton("Best Streak"),
+			tgbotapi.NewKeyboardButton("Info"),
+		),
+	)
+	message := tgbotapi.NewMessage(chatId, "Added list view keyboard")
+	message.ReplyMarkup = keyboard
+	_, err := tg.Bot.Send(message)
+	if err != nil {
+		tg.sendMessage("internal error occurred", chatId)
+		log.Println(err)
+		return
 	}
 }

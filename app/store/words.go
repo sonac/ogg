@@ -24,12 +24,12 @@ func (m *Mongo) GetWords() ([]*models.Word, error) {
 	}
 	var words []*models.Word
 	for res.Next(ctx) {
-		var w *models.Word
-		err = res.Decode(w)
+		var w models.Word
+		err = res.Decode(&w)
 		if err != nil {
 			return nil, err
 		}
-		words = append(words, w)
+		words = append(words, &w)
 	}
 	return words, nil
 }

@@ -32,11 +32,11 @@ type WordDef struct {
 	Text string      `json:"text,omitempty"`
 	Pos  string      `json:"pos,omitempty"`
 	Ts   string      `json:"ts,omitempty"`
-	Tr   Translation `json:"tr"`
+	Tr   []Translation `json:"tr"`
 }
 
 type TranslateResp struct {
-	Def WordDef `json:"def"`
+	Def []WordDef `json:"def"`
 }
 
 var (
@@ -86,9 +86,9 @@ func (c *Client) TranslateWord(word string) (*models.Word, error) {
 		return nil, err
 	}
 	w := models.Word{
-		German:  resp.Def.Tr.Text,
+		German:  resp.Def[0].Tr[0].Text,
 		English: word,
-		Gen:     resp.Def.Tr.Gen,
+		Gen:     resp.Def[0].Tr[0].Gen,
 		Meaning: "",
 	}
 	return &w, nil
