@@ -37,6 +37,6 @@ func (m *Mongo) Connect() {
 	}
 
 	m.Client = client
-	m.UserCollection = client.Database("ogg").Collection("users")
-	m.WordCollection = client.Database("ogg").Collection("words")
+	m.UserCollection = client.Database("wtw").Collection("users") //TODO: remove hardcoded db
+	m.WordCollection = client.Database("wtw").Collection("words")
 }

@@ -36,5 +36,5 @@ jobs:
             cd apps
             docker-compose stop ogg
             cat gh_token | docker login docker.pkg.github.com -u $GITHUB_USERNAME --password-stdin
-            docker pull docker.pkg.github.com/sonac/ogg/ogg:latest
+            docker pull ghcr.io/sonac/ogg/ogg:latest
             docker-compose up -d ogg
