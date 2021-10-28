@@ -45,15 +45,14 @@ type TranslateResp struct {
 
 var (
 	httpClient HTTPClient
-	db Database
 )
 
 func init() {
 	httpClient = &http.Client{}
-	db = store.NewDatabase()
 }
 
 func NewTranslator(yandexApiKey string) *Client {
+	db := store.NewDatabase()
 	words, err := db.GetWords()
 	if err != nil {
 		log.Fatalf("failed to initialize translator, %s", err)

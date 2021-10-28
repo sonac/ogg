@@ -79,7 +79,8 @@ func TestClient_TranslateWord(t *testing.T) {
 			return resp, nil
 		},
 	}
-	translator := NewTranslator("fooApiKey")
+	db := &MockDatabase{}
+	translator := Client{database: db}
 	t.Run("Testing retreiving price", func(t *testing.T) {
 		res, err := translator.TranslateWord("castle")
 		if err != nil || res.German != "Schloss"{
