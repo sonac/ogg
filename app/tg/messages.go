@@ -81,6 +81,16 @@ func (tg *Telegram) sendRandomWord(chatId int64) {
 	}
 }
 
+func (tg *Telegram) sendBestStreak(chatId int64) {
+	usr, err := tg.DB.GetUserByChatId(chatId)
+	if err != nil {
+		tg.sendMessage("internal error occurred", chatId)
+		log.Println(err)
+		return
+	}
+	tg.sendMessage(fmt.Sprintf("Your best streak is %d", usr.BestStreak), chatId)
+}
+
 func (tg *Telegram) checkAnswer(cb *tgbotapi.CallbackQuery) {
 	chatId := cb.Message.Chat.ID
 	ans := cb.Data
@@ -92,9 +102,24 @@ func (tg *Telegram) checkAnswer(cb *tgbotapi.CallbackQuery) {
 	}
 	correctAns := genToArticle(usr.CurWord.Gen)
 	if correctAns == ans {
+		usr.CurStreak += 1
+		err = tg.DB.UpdateUser(usr)
+		if err != nil {
+			log.Println(err)
+			tg.sendMessage("internal error occured", chatId)
+			return
+		}
 		tg.sendMessage("Correct!", chatId)
 	} else {
-		tg.sendMessage(fmt.Sprintf("Wrong! Correct answer is %s", correctAns), chatId)
+		usr.CurStreak = 0
+		err = tg.DB.UpdateUser(usr)
+		if err != nil {
+			log.Println(err)
+			tg.sendMessage("internal error occured", chatId)
+			return
+		}
+		msg := fmt.Sprintf("Wrong! Correct answer is %s\n You've got %d words in a row", correctAns, usr.CurStreak)
+		tg.sendMessage(msg, chatId)
 	}
 	tg.sendRandomWord(chatId)
 }

@@ -92,6 +92,10 @@ func (tg *Telegram) replyToMessage(msg *tgbotapi.Message) {
 		tg.start(msg.Chat.ID)
 	case "Next Word":
 		tg.sendRandomWord(msg.Chat.ID)
+	case "Best Streak":
+		tg.sendBestStreak(msg.Chat.ID)
+	case "Info":
+		tg.sendMessage("He-he, nothing here yet", msg.Chat.ID)
 	default:
 		tg.sendMessage("I don't understand", msg.Chat.ID)
 	}
