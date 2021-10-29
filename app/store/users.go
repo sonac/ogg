@@ -38,11 +38,15 @@ func (m *Mongo) UpdateUser(user *models.User) error {
 	if !exists {
 		return errors.New("trying to update user that doesn't exist")
 	}
+	if user.CurStreak > user.BestStreak {
+		user.BestStreak = user.CurStreak
+	}
 	_, err = m.UserCollection.UpdateOne(ctx,
 		bson.M{"telegram_chat_id": user.TelegramChatId},
 		bson.M{"$set": bson.M{
 			"best_streak":	user.BestStreak,
 			"cur_word": user.CurWord,
+			"cur_streak": user.CurStreak,
 		}},
 	)
 	return err
