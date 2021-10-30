@@ -91,6 +91,9 @@ func (c *Client) TranslateWord(word string) (*models.Word, error) {
 	if err != nil {
 		return nil, err
 	}
+	if len(resp.Def) == 0 || resp.Def[0].Tr[0].Pos != "noun"{
+		return nil, nil
+	}
 	w := models.Word{
 		German:  resp.Def[0].Tr[0].Text,
 		English: word,
