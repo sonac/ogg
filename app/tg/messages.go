@@ -121,7 +121,7 @@ func (tg *Telegram) checkAnswer(cb *tgbotapi.CallbackQuery) {
 			tg.sendMessage("internal error occured", chatId)
 			return
 		}
-		msg := fmt.Sprintf("Wrong! Correct answer is %s \n You've got %d words in a row", correctAns, curStreak)
+		msg := fmt.Sprintf("Wrong! Correct answer is %s \nYou've got %d words in a row", correctAns, curStreak)
 		tg.sendMessage(msg, chatId)
 	}
 	tg.sendRandomWord(chatId)
