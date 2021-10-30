@@ -88,3 +88,15 @@ func TestClient_TranslateWord(t *testing.T) {
 		}
 	})
 }
+
+func TestClient_filteredWords(t *testing.T) {
+	words := []*models.Word{
+		{"Wand", "Wall", "f", ""},
+		{"Tisch", "Table", "m", ""},
+	}
+	translator := Client{words: words}
+	fWords := translator.filteredWords(&[]string{"Wand"})
+	if fWords[0].German != "Tisch" {
+		t.Errorf("wrong result of filtered words")
+	}
+}

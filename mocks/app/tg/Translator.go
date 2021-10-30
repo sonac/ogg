@@ -13,13 +13,13 @@ type Translator struct {
 	mock.Mock
 }
 
-// GetRandomWord provides a mock function with given fields:
-func (_m *Translator) GetRandomWord() *models.Word {
-	ret := _m.Called()
+// GetRandomWord provides a mock function with given fields: wordsToFilter
+func (_m *Translator) GetRandomWord(wordsToFilter *[]string) *models.Word {
+	ret := _m.Called(wordsToFilter)
 
 	var r0 *models.Word
-	if rf, ok := ret.Get(0).(func() *models.Word); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(*[]string) *models.Word); ok {
+		r0 = rf(wordsToFilter)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*models.Word)
