@@ -46,6 +46,7 @@ func (m *Mongo) UpdateUser(user *models.User) error {
 		bson.M{"$set": bson.M{
 			"best_streak":	user.BestStreak,
 			"cur_word": user.CurWord,
+			"cur_streak_words": user.CurStreakWords,
 			"cur_streak": user.CurStreak,
 		}},
 	)
