@@ -2,14 +2,18 @@ version: 3
 
 tasks:
   test:
+    desc: Runs unit test
     cmds:
       - go test -v ./...
   mongo:
+    desc: Spins-up mongo in docker
     cmds:
       - docker-compose up -d mongodb
   run:
+    desc: Runs the app
     cmds:
       - go run app/main.go
   docker-build:
+    desc: Builds the docker image
     cmds:
       - docker build -t docker.pkg.github.com/sonac/ogg/ogg .
