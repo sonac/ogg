@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"next-german-words/app/store"
 	"next-german-words/app/store/models"
+	"next-german-words/app/utils"
 	"time"
 )
 
@@ -69,9 +70,10 @@ func (c *Client) RefreshWords() error {
 	return nil
 }
 
-func (c *Client) GetRandomWord() *models.Word {
+func (c *Client) GetRandomWord(wordsToFilter *[]string) *models.Word {
 	rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
-	return c.words[rand.Intn(len(c.words))]
+	words := c.filteredWords(wordsToFilter)
+	return words[rand.Intn(len(words))]
 }
 
 func (c *Client) TranslateWord(word string) (*models.Word, error) {
@@ -96,4 +98,14 @@ func (c *Client) TranslateWord(word string) (*models.Word, error) {
 		Meaning: "",
 	}
 	return &w, nil
+}
+
+func (c *Client) filteredWords(wordsToFilter *[]string) []*models.Word {
+	var words []*models.Word
+	for _, w := range c.words {
+		if !utils.ContainsStr(wordsToFilter, &w.German) && w.Gen != "" {
+			words = append(words, w)
+		}
+	}
+	return words
 }

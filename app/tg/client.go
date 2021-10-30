@@ -29,7 +29,7 @@ type Database interface {
 type Translator interface {
 	RefreshWords() error
 	TranslateWord(word string) (*models.Word, error)
-	GetRandomWord() *models.Word
+	GetRandomWord(wordsToFilter *[]string) *models.Word
 }
 
 type Telegram struct {

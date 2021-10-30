@@ -75,6 +75,7 @@ func TestCheckAnswer(t *testing.T) {
 		)
 		updatedUser := usr
 		updatedUser.CurStreak += 1
+		updatedUser.CurStreakWords = []string{"Wand"}
 		mockedMongo.On("GetUserByChatId", chatId).Return(&usr, nil)
 		mockedMongo.On("UpdateUser", &updatedUser).Return(nil)
 		correctMsg := tgbotapi.NewMessage(chatId, "Correct!")
@@ -82,7 +83,7 @@ func TestCheckAnswer(t *testing.T) {
 		wordMsg.ReplyMarkup = keyboard
 		mockedBot.On("Send", wordMsg).Return(tgbotapi.Message{}, nil)
 		mockedBot.On("Send", correctMsg).Return(tgbotapi.Message{}, nil)
-		mockedTranslator.On("GetRandomWord").Return(&word)
+		mockedTranslator.On("GetRandomWord", &updatedUser.CurStreakWords).Return(&word)
 		telegram.checkAnswer(&upd)
 		mockedBot.AssertCalled(t, "Send", correctMsg)
 		mockedBot.AssertCalled(t, "Send", wordMsg)

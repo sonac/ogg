@@ -50,8 +50,8 @@ func (tg *Telegram) addWord(msg *tgbotapi.Message) {
 }
 
 func (tg *Telegram) sendRandomWord(chatId int64) {
-	word := tg.Tr.GetRandomWord()
 	usr, err := tg.DB.GetUserByChatId(chatId)
+	word := tg.Tr.GetRandomWord(&usr.CurStreakWords)
 	if err != nil {
 		tg.sendMessage("internal error occurred", chatId)
 		log.Println(err)
@@ -103,6 +103,7 @@ func (tg *Telegram) checkAnswer(cb *tgbotapi.CallbackQuery) {
 	correctAns := genToArticle(usr.CurWord.Gen)
 	if correctAns == ans {
 		usr.CurStreak += 1
+		usr.CurStreakWords = append(usr.CurStreakWords, usr.CurWord.German)
 		err = tg.DB.UpdateUser(usr)
 		if err != nil {
 			log.Println(err)
