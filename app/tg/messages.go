@@ -114,6 +114,7 @@ func (tg *Telegram) checkAnswer(cb *tgbotapi.CallbackQuery) {
 	} else {
 		curStreak := usr.CurStreak
 		usr.CurStreak = 0
+		usr.CurStreakWords = nil
 		err = tg.DB.UpdateUser(usr)
 		if err != nil {
 			log.Println(err)
