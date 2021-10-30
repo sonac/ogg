@@ -29,8 +29,11 @@ func (m *MockDatabase) GetWords() ([]*models.Word, error) {
 }
 
 func TestClient_TranslateWord(t *testing.T) {
-	jsBody :=
-		`{
+	db := &MockDatabase{}
+	translator := Client{database: db}
+	t.Run("Testing retreiving price", func(t *testing.T) {
+		jsBody :=
+			`{
 		   "head":{
 			  
 		   },
@@ -72,19 +75,33 @@ func TestClient_TranslateWord(t *testing.T) {
 			  }
 		   ]
 		}`
-	body := ioutil.NopCloser(bytes.NewReader([]byte(jsBody)))
-	resp := &http.Response{StatusCode: 200, Body: body}
-	httpClient = &MockHTTP{
-		MockDo: func(*http.Request) (*http.Response, error) {
-			return resp, nil
-		},
-	}
-	db := &MockDatabase{}
-	translator := Client{database: db}
-	t.Run("Testing retreiving price", func(t *testing.T) {
+		body := ioutil.NopCloser(bytes.NewReader([]byte(jsBody)))
+		resp := &http.Response{StatusCode: 200, Body: body}
+		httpClient = &MockHTTP{
+			MockDo: func(*http.Request) (*http.Response, error) {
+				return resp, nil
+			},
+		}
 		res, err := translator.TranslateWord("castle")
 		if err != nil || res.German != "Schloss"{
 			t.Errorf("TestClient_TranslateWord failed, %s", err)
+		}
+	})
+	t.Run("Empty resp", func(t *testing.T) {
+		jsBody := `{
+			"head": {},
+			"def": []
+		}`
+		body := ioutil.NopCloser(bytes.NewReader([]byte(jsBody)))
+		resp := &http.Response{StatusCode: 200, Body: body}
+		httpClient = &MockHTTP{
+			MockDo: func(*http.Request) (*http.Response, error) {
+				return resp, nil
+			},
+		}
+		res, err := translator.TranslateWord("castle")
+		if err != nil || res != nil {
+			t.Errorf("we need to successfully return nil, %s", err)
 		}
 	})
 }

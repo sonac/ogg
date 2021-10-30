@@ -34,6 +34,9 @@ func (tg *Telegram) addWord(msg *tgbotapi.Message) {
 		log.Println(err)
 		return
 	}
+	if translatedWord == nil {
+		tg.sendMessage("there is no such noun in english", msg.Chat.ID)
+	}
 	err = tg.DB.InsertWord(translatedWord)
 	if err != nil {
 		tg.sendMessage("internal error occurred", msg.Chat.ID)
