@@ -95,7 +95,7 @@ func (tg *Telegram) replyToMessage(msg *tgbotapi.Message) {
 	case "Best Streak":
 		tg.sendBestStreak(msg.Chat.ID)
 	case "Info":
-		tg.sendMessage("He-he, nothing here yet", msg.Chat.ID)
+		tg.sendMessage("To add new word - type /add word_in_english. It should be noun", msg.Chat.ID)
 	default:
 		tg.sendMessage("I don't understand", msg.Chat.ID)
 	}
